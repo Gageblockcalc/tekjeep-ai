@@ -42,11 +42,10 @@ body {
   font-weight: 600;
   margin: 4px 4px 4px 0;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.2s;
 }
 
 .deal-btn:hover {
   background: #ff6b35;
   color: white;
-  transform: translateY(-1px);
 }
