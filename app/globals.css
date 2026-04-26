@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.chat-bubble {
+  max-width: 85%;
+  padding: 16px 18px;
+  border-radius: 18px;
+  line-height: 1.5;
+}
+
+@media (min-width: 640px) {
+  .chat-bubble {
+    max-width: 75%;
+    padding: 18px 22px;
+  }
+}
+
+.user-bubble {
+  background: linear-gradient(135deg, #ff6b35, #ff8c5a);
+  color: white;
+  border-bottom-right-radius: 5px;
+}
+
+.bot-bubble {
+  background: #1f1f23;
+  color: #f1f1f3;
+  border-bottom-left-radius: 5px;
+}
+
+.deal-btn {
+  display: inline-block;
+  background: #27272a;
+  color: #ff8c5a;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 600;
+  margin: 4px 4px 4px 0;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.deal-btn:hover {
+  background: #ff6b35;
+  color: white;
+  transform: translateY(-1px);
+}
