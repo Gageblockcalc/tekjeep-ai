@@ -65,7 +65,6 @@ export default function TekJeepAI() {
       const data = await res.json();
       let reply = data.reply || "Sorry, something went wrong.";
 
-      // Convert to buttons
       reply = reply.replace(/Best Deal on eBay: SEARCH:(.+)/g, 
         '<a href="https://www.ebay.com/sch/i.html?_nkw=$1" target="_blank" class="deal-btn">🛒 Best Deal on eBay</a>');
       
@@ -82,7 +81,6 @@ export default function TekJeepAI() {
 
   return (
     <div className="bg-zinc-950 text-white min-h-screen">
-      {/* Header */}
       <div className="border-b border-zinc-800 bg-black/95 py-4">
         <div className="max-w-4xl mx-auto px-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -103,7 +101,6 @@ export default function TekJeepAI() {
 
       <div className="max-w-4xl mx-auto px-4 py-8">
         {!currentVehicle ? (
-          // Vehicle Selector
           <div className="max-w-md mx-auto">
             <div className="text-center mb-8">
               <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-3xl flex items-center justify-center mx-auto mb-6">
@@ -173,7 +170,6 @@ export default function TekJeepAI() {
             </div>
           </div>
         ) : (
-          // Main Chat
           <div>
             <div className="bg-zinc-900 border border-zinc-800 rounded-2xl px-4 py-3 mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
