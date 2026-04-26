@@ -4,28 +4,21 @@ import { useState, useEffect } from 'react';
 
 export default function TekJeepAI() {
   const [currentVehicle, setCurrentVehicle] = useState<any>(null);
-  const [showAdvanced, setShowAdvanced] = useState(false);
   const [chatMessages, setChatMessages] = useState<any[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isThinking, setIsThinking] = useState(false);
-  const [showLogin, setShowLogin] = useState(false);
-  const [showHistory, setShowHistory] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userEmail, setUserEmail] = useState('');
 
-  // Load saved vehicle on mount
   useEffect(() => {
     const saved = localStorage.getItem('tekjeep_vehicle');
     if (saved) {
-      const vehicle = JSON.parse(saved);
-      setCurrentVehicle(vehicle);
+      setCurrentVehicle(JSON.parse(saved));
     }
   }, []);
 
   const saveVehicle = () => {
-    const year = (document.getElementById('year') as HTMLSelectElement).value;
-    const make = (document.getElementById('make') as HTMLSelectElement).value;
-    const model = (document.getElementById('model') as HTMLSelectElement).value;
+    const year = (document.getElementById('year') as HTMLSelectElement)?.value;
+    const make = (document.getElementById('make') as HTMLSelectElement)?.value;
+    const model = (document.getElementById('model') as HTMLSelectElement)?.value;
 
     if (!year || !model) {
       alert("Please select Year and Model");
@@ -36,13 +29,13 @@ export default function TekJeepAI() {
       year,
       make,
       model,
-      transmission: (document.getElementById('transmission') as HTMLSelectElement).value || '',
-      engine: (document.getElementById('engine') as HTMLSelectElement).value || '',
-      liftHeight: (document.getElementById('liftHeight') as HTMLSelectElement).value || '',
-      tireSize: (document.getElementById('tireSize') as HTMLInputElement).value.trim() || '',
-      wheelSize: (document.getElementById('wheelSize') as HTMLInputElement).value.trim() || '',
-      mileage: (document.getElementById('mileage') as HTMLInputElement).value || '',
-      mods: (document.getElementById('mods') as HTMLTextAreaElement).value.trim() || ''
+      transmission: (document.getElementById('transmission') as HTMLSelectElement)?.value || '',
+      engine: (document.getElementById('engine') as HTMLSelectElement)?.value || '',
+      liftHeight: (document.getElementById('liftHeight') as HTMLSelectElement)?.value || '',
+      tireSize: (document.getElementById('tireSize') as HTMLInputElement)?.value.trim() || '',
+      wheelSize: (document.getElementById('wheelSize') as HTMLInputElement)?.value.trim() || '',
+      mileage: (document.getElementById('mileage') as HTMLInputElement)?.value || '',
+      mods: (document.getElementById('mods') as HTMLTextAreaElement)?.value.trim() || ''
     };
 
     localStorage.setItem('tekjeep_vehicle', JSON.stringify(vehicle));
@@ -52,41 +45,36 @@ export default function TekJeepAI() {
   const changeVehicle = () => {
     localStorage.removeItem('tekjeep_vehicle');
     setCurrentVehicle(null);
+    window.location.reload();
   };
 
   const sendMessage = async () => {
     if (!inputMessage.trim()) return;
 
-    const userMsg = { text: inputMessage, isUser: true };
-    setChatMessages(prev => [...prev, userMsg]);
+    setChatMessages(prev => [...prev, { text: inputMessage, isUser: true }]);
     setInputMessage('');
     setIsThinking(true);
 
     try {
-      const response = await fetch('/api/chat', {
+      const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: inputMessage,
-          vehicle: currentVehicle
-        })
+        body: JSON.stringify({ message: inputMessage, vehicle: currentVehicle })
       });
 
-      const data = await response.json();
+      const data = await res.json();
       let reply = data.reply || "Sorry, something went wrong.";
 
-      // Convert SEARCH lines to buttons
+      // Convert to buttons
       reply = reply.replace(/Best Deal on eBay: SEARCH:(.+)/g, 
         '<a href="https://www.ebay.com/sch/i.html?_nkw=$1" target="_blank" class="deal-btn">🛒 Best Deal on eBay</a>');
       
       reply = reply.replace(/Best Deal on Amazon: SEARCH:(.+)/g, 
         '<a href="https://www.amazon.com/s?k=$1&tag=tekjeep-20" target="_blank" class="deal-btn">🛒 Best Deal on Amazon</a>');
 
-      const botMsg = { text: reply, isUser: false };
-      setChatMessages(prev => [...prev, botMsg]);
-    } catch (error) {
-      const errorMsg = { text: "Sorry, something went wrong. Try again.", isUser: false };
-      setChatMessages(prev => [...prev, errorMsg]);
+      setChatMessages(prev => [...prev, { text: reply, isUser: false }]);
+    } catch (err) {
+      setChatMessages(prev => [...prev, { text: "Sorry, something went wrong. Try again.", isUser: false }]);
     } finally {
       setIsThinking(false);
     }
@@ -106,20 +94,16 @@ export default function TekJeepAI() {
               <p className="text-xs text-zinc-400 -mt-0.5">Real Jeep Tech Answers</p>
             </div>
           </div>
-          
           <div className="flex items-center gap-2">
-            <button onClick={() => setShowHistory(true)} className="text-sm px-3 py-1.5 rounded-2xl border border-zinc-700 hover:bg-zinc-900">History</button>
-            <button onClick={() => setShowLogin(true)} className="text-sm px-4 py-1.5 rounded-2xl bg-zinc-800 hover:bg-zinc-700">
-              {isLoggedIn ? userEmail.split('@')[0] : 'Login / Sign Up'}
-            </button>
+            <button className="text-sm px-3 py-1.5 rounded-2xl border border-zinc-700 hover:bg-zinc-900">History</button>
+            <button className="text-sm px-4 py-1.5 rounded-2xl bg-zinc-800 hover:bg-zinc-700">Login / Sign Up</button>
           </div>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8">
-        
-        {/* Vehicle Selector */}
-        {!currentVehicle && (
+        {!currentVehicle ? (
+          // Vehicle Selector
           <div className="max-w-md mx-auto">
             <div className="text-center mb-8">
               <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-3xl flex items-center justify-center mx-auto mb-6">
@@ -134,17 +118,62 @@ export default function TekJeepAI() {
                 <label className="block text-sm font-medium text-zinc-400 mb-1">Year</label>
                 <select id="year" className="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-white">
                   <option value="">Select Year</option>
-                  {/* ... all years from 1997 to 2026 ... */}
+                  <option value="1997">1997</option>
+                  <option value="1998">1998</option>
+                  <option value="1999">1999</option>
+                  <option value="2000">2000</option>
+                  <option value="2001">2001</option>
+                  <option value="2002">2002</option>
+                  <option value="2003">2003</option>
+                  <option value="2004">2004</option>
+                  <option value="2005">2005</option>
+                  <option value="2006">2006</option>
+                  <option value="2007">2007</option>
+                  <option value="2008">2008</option>
+                  <option value="2009">2009</option>
+                  <option value="2010">2010</option>
+                  <option value="2011">2011</option>
+                  <option value="2012">2012</option>
+                  <option value="2013">2013</option>
+                  <option value="2014">2014</option>
+                  <option value="2015">2015</option>
+                  <option value="2016">2016</option>
+                  <option value="2017">2017</option>
+                  <option value="2018">2018</option>
+                  <option value="2019">2019</option>
+                  <option value="2020">2020</option>
+                  <option value="2021">2021</option>
+                  <option value="2022">2022</option>
+                  <option value="2023">2023</option>
+                  <option value="2024">2024</option>
+                  <option value="2025">2025</option>
+                  <option value="2026">2026</option>
                 </select>
               </div>
-              {/* Add the rest of the vehicle selector fields here (same as before) */}
+
+              <div>
+                <label className="block text-sm font-medium text-zinc-400 mb-1">Make</label>
+                <select id="make" className="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-white">
+                  <option value="Jeep">Jeep</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-zinc-400 mb-1">Model</label>
+                <select id="model" className="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-white">
+                  <option value="">Select Model</option>
+                  <option value="Wrangler TJ">Wrangler TJ (1997-2006)</option>
+                  <option value="Wrangler JK">Wrangler JK (2007-2018)</option>
+                  <option value="Wrangler JL">Wrangler JL (2018+)</option>
+                  <option value="Gladiator JT">Gladiator JT</option>
+                </select>
+              </div>
+
               <button onClick={saveVehicle} className="w-full bg-orange-600 hover:bg-orange-700 py-4 rounded-3xl font-semibold text-lg mt-4">Save My Jeep</button>
             </div>
           </div>
-        )}
-
-        {/* Main Chat Interface */}
-        {currentVehicle && (
+        ) : (
+          // Main Chat
           <div>
             <div className="bg-zinc-900 border border-zinc-800 rounded-2xl px-4 py-3 mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -154,10 +183,9 @@ export default function TekJeepAI() {
               <button onClick={changeVehicle} className="text-xs text-zinc-400 hover:text-white">Change</button>
             </div>
 
-            {/* Chat Area */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-5 h-[500px] overflow-y-auto space-y-6 mb-4" id="chat">
-              {chatMessages.map((msg, index) => (
-                <div key={index} className={`flex ${msg.isUser ? 'justify-end' : 'justify-start'}`}>
+            <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-5 h-[500px] overflow-y-auto space-y-6 mb-4">
+              {chatMessages.map((msg, i) => (
+                <div key={i} className={`flex ${msg.isUser ? 'justify-end' : 'justify-start'}`}>
                   <div className={`chat-bubble ${msg.isUser ? 'user-bubble' : 'bot-bubble'}`} dangerouslySetInnerHTML={{ __html: msg.text }} />
                 </div>
               ))}
@@ -168,10 +196,9 @@ export default function TekJeepAI() {
               )}
             </div>
 
-            {/* Input */}
             <div className="flex gap-3">
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
